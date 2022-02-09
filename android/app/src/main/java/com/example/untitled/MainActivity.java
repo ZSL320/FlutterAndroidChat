@@ -21,6 +21,7 @@ public class MainActivity extends FlutterActivity {
     @Override
     public void configureFlutterEngine(@NonNull @NotNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
+        flutterEngine.getPlugins().add(new myPlatFormViewPlugin());
         methodChannel=new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(),"myDemo");
         methodChannel.setMethodCallHandler(new MethodChannel.MethodCallHandler() {
             @Override

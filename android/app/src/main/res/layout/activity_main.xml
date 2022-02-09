@@ -13,7 +13,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/myTxt"
-            android:text="欢迎来到Android原生页面"
-            ></TextView>
+            android:text="欢迎来到Android原生页面" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

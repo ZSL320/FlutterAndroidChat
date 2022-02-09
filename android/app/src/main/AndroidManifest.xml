@@ -5,7 +5,19 @@
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="untitled">
-        <activity android:name=".MainActivity2"></activity>
+        <activity android:name=".shareImage"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            <intent-filter>
+                <!-- 注: 外部传入数据到这个app 接收数据分享 -->
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <!-- 注: 数据类型为任何类型 -->
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".myPlatFormViewPlugin" />
+        <activity android:name=".MainActivity2" />
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
