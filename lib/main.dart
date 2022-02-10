@@ -31,25 +31,50 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late MethodChannel methodChannel;
   late EventChannel eventChannel;
-  String _img = "";
+  late EventChannel photoChannel = new EventChannel("getPhoto");
+  late MethodChannel photoMethod = new MethodChannel("sendPhotoToFlutter");
+  late EventChannel getPhotoPath = new EventChannel("getPhotoPath");
+  String? _img;
   String androidSend = "";
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance!.addObserver(this);
     methodChannel = new MethodChannel("myDemo");
     eventChannel = new EventChannel("myEvent");
     eventChannel.receiveBroadcastStream().listen((event) {
       setState(() {
         androidSend = event;
-        print(666666);
-        print(event);
+      });
+    });
+    photoChannel.receiveBroadcastStream().listen((event) {
+      print(666666);
+      print(event);
+    });
+    getPhotoPath.receiveBroadcastStream().listen((event) {
+      setState(() {
         _img = event;
       });
     });
-    methodChannel.invokeMethod("sendPhoto");
+    photoMethod.invokeMethod("sendPhoto");
+    methodChannel.invokeMethod("sendPhotoToFlutter");
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    print("didChangeDependencies");
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // TODO: implement didChangeAppLifecycleState
+    super.didChangeAppLifecycleState(state);
+    print("didChangeAppLifecycleState");
   }
 
   @override
@@ -63,24 +88,36 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Container(
+              width: double.infinity,
+              margin: EdgeInsets.only(left: 39, right: 39,bottom: 12),
               child: RaisedButton(
-                color: Colors.yellow,
+                color: Colors.lightBlue,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 onPressed: () {
-                  openCamera(context);
+                  methodChannel.invokeMethod("upLoadPhoto");
+                  openGallery(context);
                 },
+                child: Text(
+                  "上传图片",
+                  style: TextStyle(fontSize: 15, color: Colors.white),
+                ),
               ),
             ),
+            _img != null
+                ? Container(
+                    height: 200,
+                    width: double.infinity,
+                    child: Image.file(File(_img!)),
+                  )
+                : Container(),
             Container(
-              height: 200,
               width: double.infinity,
-              child: Image.file(File(_img)),
-            ),
-            Container(
-              width: double.infinity,
-              margin: EdgeInsets.only(left: 39, right: 39),
+              margin: EdgeInsets.only(left: 39, right: 39,top: 12),
               child: RaisedButton(
                 onPressed: () {
                   methodChannel.invokeMethod("toast");
+                  print(_img);
                 },
                 color: Colors.lightBlue,
                 shape: RoundedRectangleBorder(
@@ -144,14 +181,12 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  openCamera(BuildContext context) async {
+  openGallery(BuildContext context) async {
     XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image != null) {
       setState(() {
         _img = image.path;
       });
-      print(111111);
-      print(image.path);
     }
   }
 }
