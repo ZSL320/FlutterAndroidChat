@@ -1,6 +1,7 @@
 package com.example.untitled;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
@@ -33,20 +34,27 @@ public class shareImage extends FlutterActivity {
     private EventChannel.EventSink eventSink;
     private MethodChannel methodChannel;
     static final String TYPE_IMG = "image/";
-
+    @Override
+    protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.share_layout);
+    }
     @Override
     public void configureFlutterEngine(@NonNull  FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
-        methodChannel=new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(),"myDemo");
+        methodChannel=new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(),"sendPhotoToFlutter");
         methodChannel.setMethodCallHandler(new MethodChannel.MethodCallHandler() {
             @Override
             public void onMethodCall(@NonNull MethodCall call, @NotNull MethodChannel.Result result) {
                 if(call.method.equals("sendPhoto")){
                     checkHandleShare();
-                }  
+                    Intent intent=new Intent(shareImage.this,MainActivity.class);
+                    intent.putExtra("path",imagePath);
+                    startActivity(intent);
+                }
             }
         });
-        new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(),"myEvent").setStreamHandler(new EventChannel.StreamHandler() {
+        new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(),"getPhoto").setStreamHandler(new EventChannel.StreamHandler() {
             @Override
             public void onListen(Object arguments, EventChannel.EventSink events) {
                 eventSink=events;
@@ -63,29 +71,39 @@ public class shareImage extends FlutterActivity {
     }
     private void checkHandleShare() {
         Intent intent = getIntent();
-        //没有intent数据
-        if (intent == null) {
-            Log.d("intent Date===", "intent date  is null");
-            return;
-        }
-
-        String type = intent.getType();
-        //没有数据类型
-        if (type == null) {
-            Log.d("intent Date type===", "intent type is null");
-            return;
-        }
-        if (type.startsWith(TYPE_IMG)) {
-            handleImage(intent);
-        }else{
-            Toast.makeText(this,"只能解析图片",Toast.LENGTH_LONG).show();
-            finish();
-        }
+        handleImage(intent);
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+      System.out.println("img=======onStop");
+        finish();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        System.out.println("img=======onResume");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        System.out.println("img=======onPause");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        System.out.println("img=======onDestroy");
+    }
+
     /**
      * 处理图片 得到路径
      * Processing Pictures to Get Paths
      */
+    private  String imagePath;
     private void handleImage(Intent intent) {
         Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
         String[] imgData = getRealFilePath(imageUri);
@@ -98,6 +116,7 @@ public class shareImage extends FlutterActivity {
             fileOutputStream.flush();
             fileOutputStream.close();
             sendToFlutter(file.getPath());
+            imagePath=file.getPath();
         }catch (Exception e)
         {
             Toast.makeText(this,"图片解析异常",Toast.LENGTH_LONG).show();
