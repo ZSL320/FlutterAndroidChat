@@ -37,7 +37,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late MethodChannel sendPhotoToFlutter =
       new MethodChannel("sendPhotoToFlutter");
   String? _img;
-  String androidSend = "";
+  String? androidSend;
   @override
   void initState() {
     super.initState();
@@ -136,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             ),
             Container(
               child: Text(
-                "$androidSend",
+                androidSend != null ? "$androidSend" : "",
                 style: TextStyle(fontSize: 16, color: Colors.black),
               ),
             ),

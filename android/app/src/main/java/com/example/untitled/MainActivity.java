@@ -24,13 +24,15 @@ public class MainActivity extends FlutterActivity {
     private MethodChannel methodChannel;
     private EventChannel.EventSink eventSink;
     private String path;
-    static Map<String,String> map=new HashMap<>();
     static Activity mainActivity;
+    private Map <String ,String>map=new HashMap<>();
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent=getIntent();
         path=intent.getStringExtra("path");
+        map.put("message",null);
+        map.put("path",null);
         mainActivity=this;
     }
 
