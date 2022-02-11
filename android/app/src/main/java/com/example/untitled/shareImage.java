@@ -30,8 +30,9 @@ import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
+import static com.example.untitled.MainActivity.mainActivity;
+
 public class shareImage extends FlutterActivity {
-    private EventChannel.EventSink eventSink;
     private MethodChannel methodChannel;
     static final String TYPE_IMG = "image/";
     @Override
@@ -47,38 +48,41 @@ public class shareImage extends FlutterActivity {
             @Override
             public void onMethodCall(@NonNull MethodCall call, @NotNull MethodChannel.Result result) {
                 if(call.method.equals("sendPhoto")){
+                    mainActivity.finish();
                     checkHandleShare();
                     Intent intent=new Intent(shareImage.this,MainActivity.class);
                     intent.putExtra("path",imagePath);
                     startActivity(intent);
+                    shareImage.this.finish();
                 }
             }
         });
-        new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(),"getPhoto").setStreamHandler(new EventChannel.StreamHandler() {
-            @Override
-            public void onListen(Object arguments, EventChannel.EventSink events) {
-                eventSink=events;
-            }
-
-            @Override
-            public void onCancel(Object arguments) {
-
-            }
-        });
     }
-    void sendToFlutter(String event){
-        eventSink.success(event);
-    }
+
     private void checkHandleShare() {
         Intent intent = getIntent();
-        handleImage(intent);
-    }
+        //没有intent数据
+        if (intent == null) {
+            Log.d("intent Date===", "intent date  is null");
+            return;
+        }
 
+        String type = intent.getType();
+        //没有数据类型
+        if (type == null) {
+            Log.d("intent Date type===", "intent type is null");
+            return;
+        }
+        if (type.startsWith(TYPE_IMG)) {
+            handleImage(intent);
+        }else{
+            Toast.makeText(this,"只能解析图片",Toast.LENGTH_LONG).show();
+        }
+    }
     @Override
     protected void onStop() {
         super.onStop();
       System.out.println("img=======onStop");
-        finish();
     }
 
     @Override
@@ -115,7 +119,6 @@ public class shareImage extends FlutterActivity {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 95, fileOutputStream);
             fileOutputStream.flush();
             fileOutputStream.close();
-            sendToFlutter(file.getPath());
             imagePath=file.getPath();
         }catch (Exception e)
         {

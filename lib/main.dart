@@ -34,9 +34,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late MethodChannel methodChannel;
   late EventChannel eventChannel;
-  late EventChannel photoChannel = new EventChannel("getPhoto");
-  late MethodChannel photoMethod = new MethodChannel("sendPhotoToFlutter");
-  late EventChannel getPhotoPath = new EventChannel("getPhotoPath");
+  late MethodChannel sendPhotoToFlutter =
+      new MethodChannel("sendPhotoToFlutter");
   String? _img;
   String androidSend = "";
   @override
@@ -47,19 +46,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     eventChannel = new EventChannel("myEvent");
     eventChannel.receiveBroadcastStream().listen((event) {
       setState(() {
-        androidSend = event;
+        androidSend = event["message"];
+        _img = event["path"];
       });
     });
-    photoChannel.receiveBroadcastStream().listen((event) {
-      print(666666);
-      print(event);
-    });
-    getPhotoPath.receiveBroadcastStream().listen((event) {
-      setState(() {
-        _img = event;
-      });
-    });
-    photoMethod.invokeMethod("sendPhoto");
+    sendPhotoToFlutter.invokeMethod("sendPhoto");
     methodChannel.invokeMethod("sendPhotoToFlutter");
   }
 
@@ -89,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           children: <Widget>[
             Container(
               width: double.infinity,
-              margin: EdgeInsets.only(left: 39, right: 39,bottom: 12),
+              margin: EdgeInsets.only(left: 39, right: 39, bottom: 12),
               child: RaisedButton(
                 color: Colors.lightBlue,
                 shape: RoundedRectangleBorder(
@@ -113,11 +104,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 : Container(),
             Container(
               width: double.infinity,
-              margin: EdgeInsets.only(left: 39, right: 39,top: 12),
+              margin: EdgeInsets.only(left: 39, right: 39, top: 12),
               child: RaisedButton(
                 onPressed: () {
                   methodChannel.invokeMethod("toast");
-                  print(_img);
                 },
                 color: Colors.lightBlue,
                 shape: RoundedRectangleBorder(

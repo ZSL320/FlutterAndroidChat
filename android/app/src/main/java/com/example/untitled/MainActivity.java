@@ -1,5 +1,6 @@
 package com.example.untitled;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -8,6 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
@@ -20,15 +24,14 @@ public class MainActivity extends FlutterActivity {
     private MethodChannel methodChannel;
     private EventChannel.EventSink eventSink;
     private String path;
-    private  EventChannel.EventSink photoPathSink;
-    private boolean openPhoto=false;
+    static Map<String,String> map=new HashMap<>();
+    static Activity mainActivity;
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent=getIntent();
         path=intent.getStringExtra("path");
-        System.out.println(1111111);
-        System.out.println(intent.getStringExtra("path"));
+        mainActivity=this;
     }
 
     @Override
@@ -44,11 +47,11 @@ public class MainActivity extends FlutterActivity {
                 }else if(call.method.equals("toast")){
                     Toast.makeText(MainActivity.this,"我是来自原生Android的toast",Toast.LENGTH_SHORT).show();
                 }else if(call.method.equals("sendToFlutter")){
-                    eventSink.success("我是来自原生Android的消息展示在flutter页面中");
+                    map.put("message","我是来自原生Android的消息展示在flutter页面中");
+                    eventSink.success(map);
                 }else if(call.method.equals("sendPhotoToFlutter")){
-                    photoPathSink.success(path);
-                }else if(call.method.equals("upLoadPhoto")){
-                    openPhoto=true;
+                    map.put("path",path);
+                    eventSink.success(map);
                 }
             }
         });
@@ -57,18 +60,6 @@ public class MainActivity extends FlutterActivity {
             @Override
             public void onListen(Object arguments, EventChannel.EventSink events) {
                 eventSink=events;
-            }
-
-            @Override
-            public void onCancel(Object arguments) {
-
-            }
-        });
-
-        new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(),"getPhotoPath").setStreamHandler(new EventChannel.StreamHandler() {
-            @Override
-            public void onListen(Object arguments, EventChannel.EventSink events) {
-                photoPathSink=events;
             }
 
             @Override
@@ -96,9 +87,6 @@ public class MainActivity extends FlutterActivity {
     protected void onPause() {
         super.onPause();
         System.out.println("=======onPause");
-        if(path==null){
-            finish();
-        }
     }
 
     @Override
