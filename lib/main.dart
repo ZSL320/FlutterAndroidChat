@@ -34,7 +34,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late MethodChannel methodChannel;
   late EventChannel eventChannel;
-  late MethodChannel sendPhotoToFlutter = new MethodChannel("sendPhotoToFlutter");
+  late MethodChannel sendPhotoToFlutter =
+      new MethodChannel("sendPhotoToFlutter");
   String? _img;
   String? androidSend;
   @override
