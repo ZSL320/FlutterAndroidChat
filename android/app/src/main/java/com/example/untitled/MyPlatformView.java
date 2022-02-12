@@ -6,55 +6,123 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
-
+import android.widget.TextView;
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdateFactory;
+import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
-import com.amap.api.maps.TextureMapView;
-
+import com.amap.api.maps.model.BitmapDescriptor;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.MarkerOptions;
 import org.jetbrains.annotations.NotNull;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
-import io.flutter.plugin.common.BinaryMessenger;
-import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
-
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
-import static com.example.untitled.MainActivity2.activityA;
 
 public class MyPlatformView implements PlatformView , DefaultLifecycleObserver,
         ActivityPluginBinding.OnSaveInstanceStateListener{
     private MapView mapView;
     private final Context context;
     private Activity activity;
+    public AMapLocationClient client=null;
+    private AMapLocationClientOption option=null;
+    private AMap map;
+    private TextView tvAdd;
+    private View layout;
     public MyPlatformView(Bundle savedInstanceState,Context context, Activity activity) {
         this.activity=activity;
         this.context = context;
         LayoutInflater inflater = (LayoutInflater) context  //这是关键点
                 .getSystemService(LAYOUT_INFLATER_SERVICE);
-        View layout=inflater.inflate(R.layout.basicmap_activity,null);
+         layout=inflater.inflate(R.layout.basicmap_activity,null);
         mapView=(MapView) layout.findViewById(R.id.map);
+        try {
+            initView(savedInstanceState);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         mapView.onCreate(savedInstanceState);
+       // activity.setContentView(R.layout.myplatview);可以用于展示其他的Activity
     }
 
     @Override
     public View getView() {
         return mapView;
     }
+    private void initListener() {
+        client.setLocationListener(new AMapLocationListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onLocationChanged(AMapLocation aMapLocation) {
+                if(aMapLocation!=null){
+                    if(aMapLocation.getErrorCode()==0){
+                        aMapLocation.getLocationType();//获取当前结果来源,如网络定位.GPS定位
+                        double lat=aMapLocation.getLatitude();//获取纬度
+                        double lon=aMapLocation.getLongitude();//获取经度
+                        aMapLocation.getAccuracy();//获取精度信息
+//                        option.setOnceLocation(true);
+                        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        Date date=new Date(aMapLocation.getTime());//定位时间
+                        LatLng latlon=new LatLng(lat,lon);
+                        MarkerOptions marker=new MarkerOptions();
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latlon,15));//显示在指定位置
+                        marker.position(latlon);
+                        marker.title("当前位置");
+                        marker.visible(true);
+                        BitmapDescriptor bitmapDescriptor= BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(Resources.getSystem(),R.drawable.launch_background));
+                        marker.icon(bitmapDescriptor);
+                        map.addMarker(marker);
+                        tvAdd.setText("当前位置:"+aMapLocation.getSpeed()+"         "+format.format(date));
+                    }else{
+//							Toast.makeText(LocationGPSActivity.this,"定位失败",Toast.LENGTH_SHORT).show();
+                    }
+                }
+                map.setMyLocationEnabled(true);
+            }
+        });
+    }
 
+    private void initLocation() {
+        option=new AMapLocationClientOption();
+        option.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+        option.setNeedAddress(true);
+        option.setInterval(60000);
+        client.setLocationOption(option);
+        client.startLocation();
+    }
+    
+    private void initView(Bundle savedInstanceState) throws Exception {
+        client=new AMapLocationClient(context.getApplicationContext());
+        initListener();
+        map=mapView.getMap();
+        map.setMapType(AMap.MAP_TYPE_NORMAL);
+        initLocation();
+        map.setLocationSource((LocationSource) this);// 设置定位监听
+        map.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
+        map.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
+    }
     @Override
     public void onCreate(@NonNull @NotNull LifecycleOwner owner) {
     }
 
     @Override
     public void dispose() {
-
+        client.onDestroy();
     }
 
     @Override
@@ -75,5 +143,9 @@ public class MyPlatformView implements PlatformView , DefaultLifecycleObserver,
     @Override
     public void onRestoreInstanceState(@Nullable @org.jetbrains.annotations.Nullable Bundle bundle) {
         mapView.onCreate(bundle);
+    }
+
+    @Override
+    public void onDestroy(@NonNull @NotNull LifecycleOwner owner) {
     }
 }
