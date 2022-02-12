@@ -43,6 +43,17 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+//            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+    }
 }
 
 flutter {
@@ -55,4 +66,5 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation files('libs/AMap3DMap_8.1.0_AMapNavi_8.1.0_20211029.jar')
 }

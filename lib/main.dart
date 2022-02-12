@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:untitled/platformView.dart';
 
 import 'androidView.dart';
 import 'dart:io';
@@ -14,6 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'FlutterAndroid通信',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -157,7 +159,25 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   }));
                 },
               ),
-            )
+            ),
+            Container(
+              width: double.infinity,
+              margin: EdgeInsets.only(left: 39, right: 39, top: 39),
+              child: RaisedButton(
+                color: Colors.lightBlue,
+                child: Text(
+                  "PlatformView",
+                  style: TextStyle(fontSize: 15, color: Colors.white),
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return MyPlatformView();
+                  }));
+                },
+              ),
+            ),
           ],
         ),
       ),

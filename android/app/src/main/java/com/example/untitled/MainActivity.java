@@ -8,6 +8,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.amap.api.maps.MapsInitializer;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -29,6 +31,10 @@ public class MainActivity extends FlutterActivity {
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try {
+            MapsInitializer.updatePrivacyAgree(this,true);
+            MapsInitializer.updatePrivacyShow(this,true,true);
+        }catch (Exception e){}
         Intent intent=getIntent();
         path=intent.getStringExtra("path");
         map.put("message",null);
@@ -40,6 +46,7 @@ public class MainActivity extends FlutterActivity {
     public void configureFlutterEngine(@NonNull @NotNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
         flutterEngine.getPlugins().add(new myPlatFormViewPlugin());
+        flutterEngine.getPlugins().add(new hocPlatformPlugin());
         methodChannel=new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(),"myDemo");
         methodChannel.setMethodCallHandler(new MethodChannel.MethodCallHandler() {
             @Override
