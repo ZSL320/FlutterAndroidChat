@@ -13,15 +13,14 @@ class FirstPage extends StatefulWidget {
   }
 }
 
-class FirstPageState extends State<FirstPage> with AutomaticKeepAliveClientMixin{
-
+class FirstPageState extends State<FirstPage>
+    with AutomaticKeepAliveClientMixin {
   late MethodChannel methodChannel;
   late EventChannel eventChannel;
   late MethodChannel sendPhotoToFlutter =
-  new MethodChannel("sendPhotoToFlutter");
+      new MethodChannel("sendPhotoToFlutter");
   String? _img;
   String? androidSend;
-
 
   @override
   bool get wantKeepAlive => true;
@@ -50,7 +49,7 @@ class FirstPageState extends State<FirstPage> with AutomaticKeepAliveClientMixin
           style: TextStyle(fontSize: 16, color: Colors.white),
         ),
       ),
-      body:       Center(
+      body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -73,10 +72,10 @@ class FirstPageState extends State<FirstPage> with AutomaticKeepAliveClientMixin
             ),
             _img != null
                 ? Container(
-              height: 200,
-              width: double.infinity,
-              child: Image.file(File(_img!)),
-            )
+                    height: 200,
+                    width: double.infinity,
+                    child: Image.file(File(_img!)),
+                  )
                 : Container(),
             Container(
               width: double.infinity,
@@ -180,6 +179,7 @@ class FirstPageState extends State<FirstPage> with AutomaticKeepAliveClientMixin
       ),
     );
   }
+
   openGallery(BuildContext context) async {
     XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image != null) {
@@ -188,5 +188,4 @@ class FirstPageState extends State<FirstPage> with AutomaticKeepAliveClientMixin
       });
     }
   }
-
 }
