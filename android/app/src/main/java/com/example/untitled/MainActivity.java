@@ -58,6 +58,7 @@ public class MainActivity extends FlutterActivity {
         super.configureFlutterEngine(flutterEngine);
         flutterEngine.getPlugins().add(new myPlatFormViewPlugin());
         flutterEngine.getPlugins().add(new hocPlatformPlugin());
+        flutterEngine.getPlugins().add(new myAndroidViewToFlutter());
         methodChannel=new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(),"myDemo");
         methodChannel.setMethodCallHandler(new MethodChannel.MethodCallHandler() {
             @Override
@@ -72,6 +73,8 @@ public class MainActivity extends FlutterActivity {
                 }else if(call.method.equals("sendPhotoToFlutter")){
                     map.put("path",path);
                     eventSink.success(map);
+                }else if(call.method.equals("openGdClock")){
+                    startActivity(new Intent(MainActivity.this,Gd_clock.class));
                 }
             }
         });

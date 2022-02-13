@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
@@ -31,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
@@ -43,26 +45,34 @@ public class MyPlatformView implements PlatformView , DefaultLifecycleObserver,
     private AMapLocationClientOption option=null;
     private AMap map;
     private TextView tvAdd;
-    private View layout;
-    public MyPlatformView(Bundle savedInstanceState,Context context, Activity activity) {
-        this.activity=activity;
+    private View myView;
+    private MethodChannel methodChannel;
+    private Button myButton;
+    public MyPlatformView(Context context, MethodChannel methodChannel) {
         this.context = context;
-        LayoutInflater inflater = (LayoutInflater) context  //这是关键点
-                .getSystemService(LAYOUT_INFLATER_SERVICE);
-         layout=inflater.inflate(R.layout.basicmap_activity,null);
-        mapView=(MapView) layout.findViewById(R.id.map);
+        this.methodChannel=methodChannel;
+        myView=LayoutInflater.from(context).inflate(R.layout.basicmap_activity,null);
+        mapView=(MapView) myView.findViewById(R.id.map);
+        myButton=(Button)myView.findViewById(R.id.myButton);
         try {
-            initView(savedInstanceState);
+            initView();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        mapView.onCreate(savedInstanceState);
-       // activity.setContentView(R.layout.myplatview);可以用于展示其他的Activity
+        mapView.onCreate(new Bundle());
+       // layout.setContentView(R.layout.myplatview);可以用于展示其他的Activity
+        myButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                myButton.setText("打卡成功");
+                methodChannel.invokeMethod("sendMsgToFlutter","你好，我是来自原生Android端的消息");
+            }
+        });
     }
 
     @Override
     public View getView() {
-        return mapView;
+        return myView;
     }
     private void initListener() {
         client.setLocationListener(new AMapLocationListener() {
@@ -106,7 +116,7 @@ public class MyPlatformView implements PlatformView , DefaultLifecycleObserver,
         client.startLocation();
     }
     
-    private void initView(Bundle savedInstanceState) throws Exception {
+    private void initView() throws Exception {
         client=new AMapLocationClient(context.getApplicationContext());
         initListener();
         map=mapView.getMap();

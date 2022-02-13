@@ -18,7 +18,9 @@ class MyPlatformViewState extends State<MyPlatformView> {
 
   Future<dynamic> callBack(MethodCall call) async {
     setState(() {
-      print(call);
+      print(1111111);
+      print(call.method);
+      print(call.arguments);
     });
   }
 
@@ -32,10 +34,32 @@ class MyPlatformViewState extends State<MyPlatformView> {
             style: TextStyle(fontSize: 16),
           ),
         ),
-        body: Container(
-          child: AndroidView(
-            viewType: "view_zsl",
-          ),
-        ));
+        body:Column(
+          children: [
+            Container(
+              height: 390,
+              child: AndroidView(
+                viewType: "view_zsl",
+              ),
+            ),
+            Container(
+              height: 39,
+              width: double.infinity,
+              margin: EdgeInsets.symmetric(horizontal: 22,vertical: 66),
+              child: RaisedButton(
+                onPressed: (){
+                  methodChannel.invokeMethod("sendMessage","你好，我是来自flutter的消息");
+                },
+                color: Colors.lightBlue,
+                child: Text("发送至Android"),
+                shape:RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)
+                ),
+              ),
+            )
+          ],
+        )
+
+     );
   }
 }

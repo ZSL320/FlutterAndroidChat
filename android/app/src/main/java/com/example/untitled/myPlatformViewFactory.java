@@ -15,17 +15,16 @@ import io.flutter.plugin.platform.PlatformView;
 import io.flutter.plugin.platform.PlatformViewFactory;
 
 public class myPlatformViewFactory extends PlatformViewFactory {
-    private final Activity activity;
-    private final Lifecycle lifecycle;
-    public myPlatformViewFactory( Activity activity, Lifecycle lifecycle) {
+    private final  MethodChannel methodChannel;
+    private final Context context;
+    public myPlatformViewFactory( Context context, MethodChannel methodChannel) {
         super(StandardMessageCodec.INSTANCE);
-        this.activity = activity;
-        this.lifecycle = lifecycle;
+        this.context = context;
+        this.methodChannel = methodChannel;
     }
 
     @Override
     public PlatformView create(Context context, int viewId, Object args) {
-        Bundle savedInstanceState = new Bundle();
-       return new MyPlatformView(savedInstanceState,context,activity);
+       return new MyPlatformView(context,methodChannel);
     }
 }
