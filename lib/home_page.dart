@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'android_back_desktop.dart';
 import 'first_page.dart';
 import 'map_gaoDe.dart';
 
@@ -25,6 +26,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     );
   }
 
+  Future<bool> _onBackPressed() async {
+    AndroidBackTop.backDeskTop(); //设置为返回不退出app
+    return false;
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -48,15 +54,18 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: PageView(
-          physics: NeverScrollableScrollPhysics(),
-          controller: _controller,
-          onPageChanged: (index) {
-            setState(() {
-              pageIndex = index;
-            });
-          },
-          children: [FirstPage(), GaoMapView()],
+        body: WillPopScope(
+          onWillPop: _onBackPressed,
+          child: PageView(
+            physics: NeverScrollableScrollPhysics(),
+            controller: _controller,
+            onPageChanged: (index) {
+              setState(() {
+                pageIndex = index;
+              });
+            },
+            children: [FirstPage(), GaoMapView()],
+          ),
         ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: pageIndex,

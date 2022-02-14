@@ -30,6 +30,7 @@ import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
+import static com.example.untitled.MainActivity.isOnCreate;
 import static com.example.untitled.MainActivity.mainActivity;
 
 public class shareImage extends FlutterActivity {
@@ -48,7 +49,9 @@ public class shareImage extends FlutterActivity {
             @Override
             public void onMethodCall(@NonNull MethodCall call, @NotNull MethodChannel.Result result) {
                 if(call.method.equals("sendPhoto")){
-                    mainActivity.finish();
+                    if(isOnCreate){
+                        mainActivity.finish();
+                    }
                     checkHandleShare();
                     Intent intent=new Intent(shareImage.this,MainActivity.class);
                     intent.putExtra("path",imagePath);

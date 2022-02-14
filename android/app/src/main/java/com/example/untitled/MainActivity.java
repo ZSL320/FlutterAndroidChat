@@ -31,6 +31,7 @@ import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugins.GeneratedPluginRegistrant;
 
 public class MainActivity extends FlutterActivity {
     private  EventChannel eventChannel;
@@ -38,7 +39,9 @@ public class MainActivity extends FlutterActivity {
     private EventChannel.EventSink eventSink;
     private String path;
     static Activity mainActivity;
+    static boolean isOnCreate=false;
     private Map <String ,String>map=new HashMap<>();
+    private final String CHANNEL = "android/back/desktop";
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +53,8 @@ public class MainActivity extends FlutterActivity {
         path=intent.getStringExtra("path");
         map.put("message",null);
         map.put("path",null);
-        mainActivity=this;
+        isOnCreate = true;
+        mainActivity = this;
     }
 
     @Override
@@ -59,6 +63,15 @@ public class MainActivity extends FlutterActivity {
         flutterEngine.getPlugins().add(new myPlatFormViewPlugin());
         flutterEngine.getPlugins().add(new hocPlatformPlugin());
         flutterEngine.getPlugins().add(new myAndroidViewToFlutter());
+        //禁止点击返回键退出应用，用于即时通讯应用
+        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler(
+                (methodCall, result) -> {
+                    if (methodCall.method.equals("backDesktop")) {
+                        result.success(true);
+                        moveTaskToBack(false);//这里是关键
+                    }
+                }
+        );
         methodChannel=new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(),"myDemo");
         methodChannel.setMethodCallHandler(new MethodChannel.MethodCallHandler() {
             @Override
