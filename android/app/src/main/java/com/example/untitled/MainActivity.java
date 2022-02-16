@@ -77,7 +77,7 @@ public class MainActivity extends FlutterActivity {
             @Override
             public void onMethodCall(@NonNull @NotNull MethodCall call, @NonNull @NotNull MethodChannel.Result result) {
                 if(call.method.equals("open")){
-                    startActivity(new Intent(MainActivity.this,MainActivity2.class));
+                    startActivity(new Intent(MainActivity.this,myListView.class));
                 }else if(call.method.equals("toast")){
                     Toast.makeText(MainActivity.this,"我是来自原生Android的toast",Toast.LENGTH_SHORT).show();
                 }else if(call.method.equals("sendToFlutter")){

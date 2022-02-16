@@ -14,7 +14,10 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
@@ -30,7 +33,10 @@ import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.MarkerOptions;
 import org.jetbrains.annotations.NotNull;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
@@ -48,26 +54,37 @@ public class MyPlatformView implements PlatformView , DefaultLifecycleObserver,
     private View myView;
     private MethodChannel methodChannel;
     private Button myButton;
+
+
+    private ListView listView;
+    private View myListDataView;
+    private List <ListData> data=new ArrayList<>();
     public MyPlatformView(Context context, MethodChannel methodChannel) {
         this.context = context;
         this.methodChannel=methodChannel;
+        //listview
+//        myListDataView=LayoutInflater.from(context).inflate(R.layout.activity_my_list_view,null);
+//        for(int i =0;i<20;i++){
+//            ListData listData=new ListData();
+//            listData.setName("魁拔"+i);
+//            data.add(listData);
+//        }
+//        listView= myListDataView.findViewById(R.id.lv);
+//        listView.setAdapter(new adapter(data,context));
+        //mapview 高德地图mapview
         myView=LayoutInflater.from(context).inflate(R.layout.basicmap_activity,null);
-        mapView=(MapView) myView.findViewById(R.id.map);
-        myButton=(Button)myView.findViewById(R.id.myButton);
-        try {
-            initView();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        mapView=myView.findViewById(R.id.map);
         mapView.onCreate(new Bundle());
-       // layout.setContentView(R.layout.myplatview);可以用于展示其他的Activity
-        myButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                myButton.setText("打卡成功");
-                methodChannel.invokeMethod("sendMsgToFlutter","你好，我是来自原生Android端的消息");
-            }
-        });
+        myButton=(Button)myView.findViewById(R.id.myButton);
+        myButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        methodChannel.invokeMethod("SendMessageToFlutter","你好，我是来自Android端的消息");
+                        myButton.setText("打卡成功");
+                    }
+                }
+        );
     }
 
     @Override

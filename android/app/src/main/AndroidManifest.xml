@@ -103,7 +103,8 @@
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="FlutterAndroid">
-        <activity android:name=".myAndroidViewPlatform"></activity>
+        <activity android:name=".myListView"></activity>
+        <activity android:name=".myAndroidViewPlatform" />
         <activity android:name=".myAndroidViewToFlutter" />
         <activity android:name=".L" />
         <activity android:name=".MyApplication" />
